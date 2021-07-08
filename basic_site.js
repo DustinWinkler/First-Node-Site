@@ -1,25 +1,26 @@
-import { createServer } from 'http'
-import { readFile } from 'fs'
+import express from 'express'
+import path from 'path'
 
-createServer(function (req,res) {
-  const baseURL = 'http://' + req.headers.host + '/';
-  const reqURL = new URL(req.url,baseURL);
-  const paths = ['/about.html', '/contact.html', './index.html']
-  let filename = ""
-  if (reqURL.pathname === "/") {
-    filename = "./index.html"
-  } else if (!paths.includes(reqURL.pathname)) {
-    filename = "./404.html"
-  } else {
-    filename = "." + reqURL.pathname
-  }
+const app = express()
+const port = 8080
+const __dirname = path.resolve(path.dirname(''));
 
-  console.log(filename)
-  console.log(reqURL.pathname)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '/index.html'))
+})
 
-  readFile(filename, function(err, data) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    return res.end();
-  })
-}).listen(8080)
+app.get('/about.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '/about.html'))
+})
+
+app.get('/contact.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '/contact.html'))
+})
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/404.html'))
+})
+
+app.listen(port, ()=>{
+  console.log('Server start...')
+})
